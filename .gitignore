@@ -14,6 +14,7 @@ gen/
 
 # Gradle files
 .gradle/
+.idea
 build/
 
 # Local configuration file (sdk path, etc)
@@ -24,3 +25,9 @@ proguard/
 
 # Log Files
 *.log
+
+# Android Studio
+.idea
+#.idea/workspace.xml - remove # and delete .idea if it better suit your needs.
+.gradle
+build/

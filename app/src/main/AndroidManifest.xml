@@ -21,13 +21,13 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.orangegangsters.github.lib.SensorStepService"
+        <service android:name=".Implementation.SensorStepServiceImpl"
             android:exported="false"/>
 
-        <receiver android:name="com.orangegangsters.github.lib.SensorStepReceiver" >
+        <receiver android:name=".Implementation.SensorStepReceiverImpl" >
         </receiver>
 
-        <receiver android:name="com.orangegangsters.github.lib.BootCompletedReceiver" >
+        <receiver android:name=".Implementation.BootCompletedReceiverImpl" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.omada.prevent.receiver.BootCompletedReceiver.START_UPDATE_SERVICE" />

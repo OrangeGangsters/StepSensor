@@ -10,14 +10,16 @@ import android.util.Log;
  * {@link com.orangegangsters.github.lib.SensorStepService}
  * Created by oliviergoutay on 2/5/15.
  */
-public class SensorStepReceiver extends BroadcastReceiver {
+public abstract class SensorStepReceiver<T extends SensorStepService> extends BroadcastReceiver {
 
     private static final String TAG = "SensorStepReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "Starting SensorStepReceiver");
-        Intent updateService = new Intent(context, SensorStepService.class);
+        Intent updateService = new Intent(context, getServiceClass());
         context.startService(updateService);
     }
+
+    public abstract Class<T> getServiceClass();
 }

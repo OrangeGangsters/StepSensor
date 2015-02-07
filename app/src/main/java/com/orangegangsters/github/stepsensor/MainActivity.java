@@ -16,6 +16,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private TextView mSteps;
     private Button mStart;
     private Button mStop;
+    private Button mZero;
 
     private SensorStepService mSensorService;
 
@@ -31,9 +32,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         mSteps = (TextView) findViewById(R.id.steps_textView);
         mStart = (Button) findViewById(R.id.start_button);
         mStop = (Button) findViewById(R.id.stop_button);
+        mZero = (Button) findViewById(R.id.zero_button);
 
         mStart.setOnClickListener(this);
         mStop.setOnClickListener(this);
+        mZero.setOnClickListener(this);
 
         SensorStepService.setCallback(this);
         mSensorService = new SensorStepServiceImpl(this);
@@ -48,6 +51,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 break;
             case R.id.stop_button:
                 SensorStepServiceManager.stopAutoUpdate(this);
+                break;
+            case R.id.zero_button:
+                mSensorService.storeZeroSteps();
+                mSteps.setText("" + mSensorService.getSteps());
                 break;
         }
     }

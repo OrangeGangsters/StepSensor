@@ -64,7 +64,13 @@ public abstract class SensorStepService extends Service implements SensorEventLi
                 int steps = (int) event.values[0];
                 if (steps > 0) {
                     Log.d(TAG, "Sensor: from registering " + event.values[0]);
-                    storeSteps(steps);
+
+                    storeRawSteps(steps);
+
+                    //Store the number of zero steps if none yet
+                    if(getZeroSteps() == 0) {
+                        storeZeroSteps();
+                    }
 
                     updateCallback(steps);
                 }
@@ -145,8 +151,52 @@ public abstract class SensorStepService extends Service implements SensorEventLi
         return mSharedPreferences.getBoolean(SensorStepServiceManager.STEP_COUNTER_ACTIVATED_PREFERENCE_KEY, false);
     }
 
-    public abstract int getSteps();
+    /**
+     * Returns the step stored by doing:
+     * {@link #getRawSteps()} minus {@link #getZeroSteps()}
+     *
+     * @return the actual steps
+     */
+    public int getSteps() {
+        Log.d(TAG, "getSteps called ==> Steps:" + getRawSteps() + " getZeroSteps:" + getZeroSteps());
+        return getRawSteps() - getZeroSteps();
+    }
 
-    public abstract void storeSteps(int steps);
+    /**
+     * Let the implementation handles the storage of the steps
+     * - {@link android.content.SharedPreferences}
+     * - {@link android.database.sqlite.SQLiteDatabase}
+     * - Others
+     *
+     * @return the steps stored
+     */
+    public abstract int getRawSteps();
+
+    /**
+     * Let the implementation handles the storage of the steps
+     * - {@link android.content.SharedPreferences}
+     * - {@link android.database.sqlite.SQLiteDatabase}
+     * - Others
+     * Used by {@link android.hardware.SensorEventListener#onSensorChanged(android.hardware.SensorEvent)}
+     *
+     * @param steps the number of steps we want to store.
+     */
+    public abstract void storeRawSteps(int steps);
+
+    /**
+     * Let the implementation handles the storage of the zero steps.
+     * The {@link android.hardware.SensorEventListener} returns the number of steps since the previous reboot.
+     * We need to store a zero value we first access it, when the day changes etc...
+     *
+     * @return the zero steps stored
+     */
+    public abstract int getZeroSteps();
+
+    /**
+     * Let the implementation handles the storage of the zero steps.
+     * The {@link android.hardware.SensorEventListener} returns the number of steps since the previous reboot.
+     * We need to store a zero value we first access it, when the day changes etc...
+     */
+    public abstract void storeZeroSteps();
 
 }

@@ -1,10 +1,13 @@
 package com.orangegangsters.github.lib;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -130,6 +133,18 @@ public abstract class SensorStepServiceManager<T extends SensorStepReceiver> {
      */
     public static void stopAutoUpdate(Context context) {
         context.sendBroadcast(new Intent(STOP_SENSOR_SERVICE));
+    }
+
+    /**
+     * Allows to know if the {@link android.hardware.Sensor#TYPE_STEP_COUNTER} is available for the device or not
+     *
+     * @return true if the feature is available, false otherwise.
+     */
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static boolean isStepCounterFeatureAvailable(PackageManager pm) {   // Require at least Android KitKat
+        int currentApiVersion = (int) Build.VERSION.SDK_INT;
+        // Check that the device supports the step counter and detector sensors
+        return currentApiVersion >= 19 && pm.hasSystemFeature(PackageManager.FEATURE_SENSOR_STEP_COUNTER) && pm.hasSystemFeature(PackageManager.FEATURE_SENSOR_STEP_DETECTOR);
     }
 
     public void activateStepCounter(boolean activate) {

@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -86,7 +85,7 @@ public abstract class SensorStepService extends Service implements SensorEventLi
     /**
      * Allows to register to the {@link android.hardware.Sensor#TYPE_STEP_COUNTER} for counting step
      * thanks to the hardware chip.
-     * Must calls {@link #isStepCounterFeatureAvailable(android.content.pm.PackageManager)} before to
+     * Must calls {@link com.orangegangsters.github.lib.SensorStepServiceManager#isStepCounterFeatureAvailable(android.content.pm.PackageManager)} before to
      * know if the feature is available.
      */
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -101,7 +100,7 @@ public abstract class SensorStepService extends Service implements SensorEventLi
     /**
      * Allows to unregister to the {@link android.hardware.Sensor#TYPE_STEP_COUNTER} for counting step
      * thanks to the hardware chip.
-     * Must calls {@link #isStepCounterFeatureAvailable(android.content.pm.PackageManager)} before to
+     * Must calls {@link com.orangegangsters.github.lib.SensorStepServiceManager#isStepCounterFeatureAvailable(android.content.pm.PackageManager)} before to
      * know if the feature is available.
      */
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -111,18 +110,6 @@ public abstract class SensorStepService extends Service implements SensorEventLi
             SensorManager sm = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
             sm.unregisterListener(this);
         }
-    }
-
-    /**
-     * Allows to know if the {@link android.hardware.Sensor#TYPE_STEP_COUNTER} is available for the device or not
-     *
-     * @return true if the feature is available, false otherwise.
-     */
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    public boolean isStepCounterFeatureAvailable(PackageManager pm) {   // Require at least Android KitKat
-        int currentApiVersion = (int) Build.VERSION.SDK_INT;
-        // Check that the device supports the step counter and detector sensors
-        return currentApiVersion >= 19 && pm.hasSystemFeature(PackageManager.FEATURE_SENSOR_STEP_COUNTER) && pm.hasSystemFeature(PackageManager.FEATURE_SENSOR_STEP_DETECTOR);
     }
 
     protected void updateCallback(int steps) {

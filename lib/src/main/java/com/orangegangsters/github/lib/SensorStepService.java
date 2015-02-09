@@ -159,7 +159,14 @@ public abstract class SensorStepService extends Service implements SensorEventLi
      */
     public int getSteps() {
         Log.d(TAG, "getSteps called ==> Steps:" + getRawSteps() + " getZeroSteps:" + getZeroSteps());
-        return getRawSteps() - getZeroSteps();
+        int steps = getRawSteps() - getZeroSteps();
+
+        if(steps < 0) {
+            storeZeroSteps();
+            return 0;
+        }
+
+        return steps;
     }
 
     /**

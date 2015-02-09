@@ -21,15 +21,24 @@ public abstract class BootCompletedReceiver<T extends SensorStepServiceManager> 
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
-
         Log.d(TAG, "onReceive, action : " + intent.getAction());
-        if (intent.getAction().equalsIgnoreCase(Intent.ACTION_BOOT_COMPLETED) ||
-                intent.getAction().equalsIgnoreCase(SensorStepServiceManager.START_SENSOR_SERVICE)) {
-            //TODO check if enable disable in SharedPreferences?
-            getSensorManagerImpl().startStepSensorService(context, intent);
+
+        //Check if we need to start on boot completed
+        if (intent.getAction().equalsIgnoreCase(Intent.ACTION_BOOT_COMPLETED)) {
+            if (SensorStepServiceManager.isStepCounterActivated(context)) {
+                getSensorManagerImpl().startStepSensorService(context, intent);
+            } else {
+                getSensorManagerImpl().stopAutoUpdateService(context);
+            }
             return;
         }
+
+        //Start the service on START_SENSOR_SERVICE
+        if(intent.getAction().equalsIgnoreCase(SensorStepServiceManager.START_SENSOR_SERVICE)) {
+            getSensorManagerImpl().startStepSensorService(context, intent);
+        }
+
+        //Stop the service on STOP_SENSOR_SERVICE
         if (intent.getAction().equalsIgnoreCase(SensorStepServiceManager.STOP_SENSOR_SERVICE)) {
             getSensorManagerImpl().stopAutoUpdateService(context);
         }

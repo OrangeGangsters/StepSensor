@@ -138,5 +138,10 @@ public abstract class SensorStepServiceManager<T extends SensorStepReceiver> {
         editor.apply();
     }
 
+    public static boolean isStepCounterActivated(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getBoolean(STEP_COUNTER_ACTIVATED_PREFERENCE_KEY, false);
+    }
+
     public abstract Class<T> getReceiverClass();
 }

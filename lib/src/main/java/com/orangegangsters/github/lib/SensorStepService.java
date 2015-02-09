@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -12,7 +11,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
@@ -24,18 +22,13 @@ public abstract class SensorStepService extends Service implements SensorEventLi
 
     protected Context mContext;
     private static SensorStepCallback mCallback;
-
-    /**
-     * The {@link android.content.SharedPreferences} used to store the activate state
-     */
-    protected SharedPreferences mSharedPreferences;
+    private SensorStepServiceManager mSensorManager;
 
     public SensorStepService() {
     }
 
     public SensorStepService(Context context) {
         this.mContext = context;
-        this.mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
     }
 
     @Override
@@ -43,9 +36,8 @@ public abstract class SensorStepService extends Service implements SensorEventLi
         Log.d(TAG, "SensorStepService onStartCommand service");
 
         this.mContext = getApplicationContext();
-        this.mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 
-        if (isStepCounterActivated()) {
+        if (SensorStepServiceManager.isStepCounterActivated(mContext)) {
             registerSensorStep();
         } else {
             unregisterSensorStep();
@@ -56,7 +48,7 @@ public abstract class SensorStepService extends Service implements SensorEventLi
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (isStepCounterActivated()) {
+        if (SensorStepServiceManager.isStepCounterActivated(mContext)) {
             if (event.values[0] > Integer.MAX_VALUE) {
                 Log.d(TAG, "Sensor: probably not a real value: " + event.values[0]);
                 return;
@@ -145,10 +137,6 @@ public abstract class SensorStepService extends Service implements SensorEventLi
 
     public static void setCallback(SensorStepCallback sensorStepCallback) {
         mCallback = sensorStepCallback;
-    }
-
-    public boolean isStepCounterActivated() {
-        return mSharedPreferences.getBoolean(SensorStepServiceManager.STEP_COUNTER_ACTIVATED_PREFERENCE_KEY, false);
     }
 
     /**

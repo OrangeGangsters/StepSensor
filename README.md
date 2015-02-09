@@ -6,7 +6,7 @@ A SwipeRefreshLayout extension that allows to swipe in both direction (API 9+)
 To include in your project, add this to your build.gradle file:
 ```
    //StepSensor
-   compile 'com.github.orangegangsters:sensorstep:1.2.0@aar'
+   compile 'com.github.orangegangsters:sensorstep:1.3.0@aar'
 ```
 
 ========

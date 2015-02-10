@@ -23,6 +23,8 @@ public abstract class SensorStepService extends Service implements SensorEventLi
     private static SensorStepCallback mCallback;
     private SensorStepServiceManager mSensorManager;
 
+    public static boolean isRunning;
+
     public SensorStepService() {
     }
 
@@ -31,10 +33,17 @@ public abstract class SensorStepService extends Service implements SensorEventLi
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        isRunning = true;
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "SensorStepService onStartCommand service");
 
         this.mContext = getApplicationContext();
+        isRunning = true;
 
         if (SensorStepServiceManager.isStepCounterActivated(mContext)) {
             registerSensorStep();
@@ -43,6 +52,18 @@ public abstract class SensorStepService extends Service implements SensorEventLi
         }
 
         return Service.START_STICKY;
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        isRunning = false;
+        return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onDestroy() {
+        isRunning = false;
+        super.onDestroy();
     }
 
     @Override
@@ -59,7 +80,7 @@ public abstract class SensorStepService extends Service implements SensorEventLi
                     storeRawSteps(steps);
 
                     //Store the number of zero steps if none yet
-                    if(getZeroSteps() == 0) {
+                    if (getZeroSteps() == 0) {
                         storeZeroSteps();
                     }
 
@@ -136,7 +157,7 @@ public abstract class SensorStepService extends Service implements SensorEventLi
         Log.d(TAG, "getSteps called ==> Steps:" + getRawSteps() + " getZeroSteps:" + getZeroSteps());
         int steps = getRawSteps() - getZeroSteps();
 
-        if(steps < 0) {
+        if (steps < 0) {
             storeZeroSteps();
             return 0;
         }

@@ -31,12 +31,12 @@ public abstract class SensorStepServiceManager<T extends SensorStepReceiver> {
     /**
      * Broadcast event that is sent when the user grants us permission to get automatic tracking data
      */
-    public static final String START_SENSOR_SERVICE = "com.omada.prevent.receiver.BootCompletedReceiver.START_UPDATE_SERVICE";
+    public static final String START_SENSOR_SERVICE = "START_SENSOR_SERVICE";
 
     /**
      * Broadcast event that is sent when the user wants to revoke permission to get automatic tracking data.
      */
-    public static final String STOP_SENSOR_SERVICE = "com.omada.prevent.receiver.BootCompletedReceiver.STOP_UPDATE_SERVICE";
+    public static final String STOP_SENSOR_SERVICE = "STOP_SENSOR_SERVICE";
 
     /**
      * A service ID to recognize if the service is declared in the {@link android.app.AlarmManager} or not
@@ -122,7 +122,9 @@ public abstract class SensorStepServiceManager<T extends SensorStepReceiver> {
      * @param context The context to use to send the broadcast
      */
     public static void startAutoUpdate(Context context) {
-        context.sendBroadcast(new Intent(START_SENSOR_SERVICE));
+        if (!SensorStepService.isRunning) {
+            context.sendBroadcast(new Intent(START_SENSOR_SERVICE));
+        }
     }
 
     /**

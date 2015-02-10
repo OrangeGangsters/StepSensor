@@ -17,8 +17,6 @@ public abstract class BootCompletedReceiver<T extends SensorStepServiceManager> 
      */
     private static final String TAG = "BootCompletedReceiver";
 
-    private static SensorStepServiceManager mSensorManager;
-
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "onReceive, action : " + intent.getAction());

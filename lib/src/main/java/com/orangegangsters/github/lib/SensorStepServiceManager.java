@@ -31,12 +31,12 @@ public abstract class SensorStepServiceManager<T extends SensorStepReceiver> {
     /**
      * Broadcast event that is sent when the user grants us permission to get automatic tracking data
      */
-    public static final String START_SENSOR_SERVICE = "START_SENSOR_SERVICE";
+    public static final String START_SENSOR_SERVICE = "com.orangegangsters.github.lib.BootCompletedReceiver.START_SENSOR_SERVICE";
 
     /**
      * Broadcast event that is sent when the user wants to revoke permission to get automatic tracking data.
      */
-    public static final String STOP_SENSOR_SERVICE = "STOP_SENSOR_SERVICE";
+    public static final String STOP_SENSOR_SERVICE = "com.orangegangsters.github.lib.BootCompletedReceiver.STOP_SENSOR_SERVICE";
 
     /**
      * A service ID to recognize if the service is declared in the {@link android.app.AlarmManager} or not

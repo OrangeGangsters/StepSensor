@@ -122,9 +122,7 @@ public abstract class SensorStepServiceManager<T extends SensorStepReceiver> {
      * @param context The context to use to send the broadcast
      */
     public static void startAutoUpdate(Context context) {
-        if (!SensorStepService.isRunning) {
-            context.sendBroadcast(new Intent(START_SENSOR_SERVICE));
-        }
+        context.sendBroadcast(new Intent(START_SENSOR_SERVICE));
     }
 
     /**

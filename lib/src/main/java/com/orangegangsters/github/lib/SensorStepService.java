@@ -23,8 +23,6 @@ public abstract class SensorStepService extends Service implements SensorEventLi
     private static SensorStepCallback mCallback;
     private SensorStepServiceManager mSensorManager;
 
-    public static boolean isRunning;
-
     public SensorStepService() {
     }
 
@@ -33,17 +31,10 @@ public abstract class SensorStepService extends Service implements SensorEventLi
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        isRunning = true;
-    }
-
-    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "SensorStepService onStartCommand service");
 
         this.mContext = getApplicationContext();
-        isRunning = true;
 
         if (SensorStepServiceManager.isStepCounterActivated(mContext)) {
             registerSensorStep();
@@ -52,18 +43,6 @@ public abstract class SensorStepService extends Service implements SensorEventLi
         }
 
         return Service.START_STICKY;
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        isRunning = false;
-        return super.onUnbind(intent);
-    }
-
-    @Override
-    public void onDestroy() {
-        isRunning = false;
-        super.onDestroy();
     }
 
     @Override

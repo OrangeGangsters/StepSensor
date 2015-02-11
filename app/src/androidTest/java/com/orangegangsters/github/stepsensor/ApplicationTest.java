@@ -68,6 +68,46 @@ public class ApplicationTest extends ActivityInstrumentationTestCase2<MainActivi
         solo.unlockScreen();
     }
 
+    /**
+     * Test the activation/deactivation of the StepTracking service.
+     * Needs to be run first. PendingIntent instances are kept in app memory even if disabled until
+     * the app is shutdown. Close the app before (remove from app history or force close).
+     */
+    @SmallTest
+    public void testActivateDeactivateStepTracking() {
+        //Check no service running
+        final Intent retrieverIntent = new Intent(getActivity(), SensorStepReceiverImpl.class);
+        assertTrue(solo.waitForCondition(new Condition() {
+            @Override
+            public boolean isSatisfied() {
+                PendingIntent pIntent = PendingIntent.getBroadcast(getActivity(), SensorStepServiceManager.SERVICE_ID, retrieverIntent, PendingIntent.FLAG_NO_CREATE);
+                return pIntent == null;
+            }
+        }, 60000));
+
+        //Check started
+        SensorStepServiceManagerImpl.startAutoUpdate(solo.getCurrentActivity());
+        assertTrue(solo.waitForCondition(new Condition() {
+            @Override
+            public boolean isSatisfied() {
+                PendingIntent pIntent = PendingIntent.getBroadcast(getActivity(), SensorStepServiceManager.SERVICE_ID, retrieverIntent, PendingIntent.FLAG_NO_CREATE);
+                return pIntent != null;
+            }
+        }, 60000));
+        assertTrue(SensorStepServiceManager.isStepCounterActivated(solo.getCurrentActivity()));
+
+        SensorStepServiceManagerImpl.stopAutoUpdate(solo.getCurrentActivity());
+        assertFalse(solo.waitForCondition(new Condition() {
+            @Override
+            public boolean isSatisfied() {
+                return !SensorStepServiceManager.isStepCounterActivated(solo.getCurrentActivity());
+            }
+        }, 60000));
+    }
+
+    /**
+     * Test if the method getSteps() is returning rawSteps - zeroSteps
+     */
     @SmallTest
     public void testGetSteps() {
         //Store numbers
@@ -86,38 +126,9 @@ public class ApplicationTest extends ActivityInstrumentationTestCase2<MainActivi
         assertEquals(raw - zero, sensorStepService.getSteps());
     }
 
-    @SmallTest
-    public void testActivateDeactivateStepTracking() {
-        //Check no service running
-        final Intent retrieverIntent = new Intent(getActivity(), SensorStepReceiverImpl.class);
-        assertTrue(solo.waitForCondition(new Condition() {
-            @Override
-            public boolean isSatisfied() {
-                PendingIntent pIntent = PendingIntent.getBroadcast(getActivity(), SensorStepServiceManager.SERVICE_ID, retrieverIntent, PendingIntent.FLAG_NO_CREATE);
-                return pIntent != null;
-            }
-        }, 30000));
-
-        //Check started
-        SensorStepServiceManagerImpl.startAutoUpdate(solo.getCurrentActivity());
-        assertTrue(solo.waitForCondition(new Condition() {
-            @Override
-            public boolean isSatisfied() {
-                PendingIntent pIntent = PendingIntent.getBroadcast(getActivity(), SensorStepServiceManager.SERVICE_ID, retrieverIntent, PendingIntent.FLAG_NO_CREATE);
-                return pIntent != null;
-            }
-        }, 30000));
-        assertTrue(SensorStepServiceManager.isStepCounterActivated(solo.getCurrentActivity()));
-
-        SensorStepServiceManagerImpl.stopAutoUpdate(solo.getCurrentActivity());
-        assertFalse(solo.waitForCondition(new Condition() {
-            @Override
-            public boolean isSatisfied() {
-                return !SensorStepServiceManager.isStepCounterActivated(solo.getCurrentActivity());
-            }
-        }, 30000));
-    }
-
+    /**
+     * Test the zeroSteps setting on first activation and on the manager's method
+     */
     @SmallTest
     public void testSetZeroSteps() {
         //Reset everything
@@ -137,7 +148,7 @@ public class ApplicationTest extends ActivityInstrumentationTestCase2<MainActivi
             public boolean isSatisfied() {
                 return sensorStepService.getZeroSteps() != 0;
             }
-        }, 30000));
+        }, 60000));
 
         //Set zero steps on method called
         sensorStepService.storeRawSteps(sensorStepService.getZeroSteps() + 5);
@@ -147,6 +158,6 @@ public class ApplicationTest extends ActivityInstrumentationTestCase2<MainActivi
             public boolean isSatisfied() {
                 return sensorStepService.getZeroSteps() == sensorStepService.getRawSteps();
             }
-        }, 10000));
+        }, 30000));
     }
 }

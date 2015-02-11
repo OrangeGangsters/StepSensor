@@ -9,6 +9,8 @@ To include in your project, add this to your build.gradle file:
    compile 'com.github.orangegangsters:sensorstep:1.3.4@aar'
 ```
 
+![Demo](app/src/main/res/raw/github.png)
+
 ========
 
 ### Usage

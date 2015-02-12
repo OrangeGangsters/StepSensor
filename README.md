@@ -11,6 +11,8 @@ To include in your project, add this to your build.gradle file:
 
 ![Demo](app/src/main/res/raw/github.png)
 
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-StepSensor-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1524)
+
 ========
 
 ### Usage

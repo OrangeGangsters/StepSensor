@@ -1,4 +1,4 @@
-# StepSensor
+# StepSensor [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-StepSensor-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1524)
 A library containing a custom Service allowing to collect data from the Sensor.TYPE_STEP_COUNTER introduced with Android 4.4 (available only for devices that supports this hardware feature)
 
 A SwipeRefreshLayout extension that allows to swipe in both direction (API 9+)
@@ -10,8 +10,6 @@ To include in your project, add this to your build.gradle file:
 ```
 
 ![Demo](app/src/main/res/raw/github.png)
-
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-StepSensor-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1524)
 
 ========
 

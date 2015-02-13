@@ -1,6 +1,8 @@
 package com.orangegangsters.github.lib;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +12,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 /**
@@ -35,6 +38,11 @@ public abstract class SensorStepService extends Service implements SensorEventLi
         Log.d(TAG, "SensorStepService onStartCommand service");
 
         this.mContext = getApplicationContext();
+
+        //Start as a foreground service to keep running
+        if (mContext != null) {
+            startForeground(SensorStepServiceManager.SERVICE_ID, getNotification(mContext));
+        }
 
         if (SensorStepServiceManager.isStepCounterActivated(mContext)) {
             registerSensorStep();
@@ -112,6 +120,25 @@ public abstract class SensorStepService extends Service implements SensorEventLi
         }
     }
 
+    /**
+     * Get the notification to display while running the service in foreground.
+     */
+    private Notification getNotification(Context context) {
+        Intent notificationIntent = new Intent(context, getNotificationLaunchClass());
+        PendingIntent contentIntent = PendingIntent.getActivity(context,
+                0, notificationIntent,
+                PendingIntent.FLAG_CANCEL_CURRENT);
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(getNotificationIcon())
+                        .setContentTitle(getNotificationContentTitle())
+                        .setContentText(getNotificationContentText())
+                        .setContentIntent(contentIntent);
+
+        return mBuilder.build();
+    }
+
     protected void updateCallback(int steps) {
         if (mCallback != null) {
             mCallback.onUpdateSteps(steps);
@@ -180,5 +207,25 @@ public abstract class SensorStepService extends Service implements SensorEventLi
      * We need to store a zero value we first access it, when the day changes etc...
      */
     public abstract void storeZeroSteps();
+
+    /**
+     * Return the class you want to be launch while clicking on the service notification.
+     */
+    public abstract Class getNotificationLaunchClass();
+
+    /**
+     * Return the id of the icon you want to be displayed while the service is launched.
+     */
+    public abstract int getNotificationIcon();
+
+    /**
+     * Return the String you want to be displayed as the title while the service is launched and the notification shown.
+     */
+    public abstract String getNotificationContentTitle();
+
+    /**
+     * Return the String you want to be displayed as the content while the service is launched and the notification shown.
+     */
+    public abstract String getNotificationContentText();
 
 }

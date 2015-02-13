@@ -26,7 +26,7 @@ public abstract class SensorStepServiceManager<T extends SensorStepReceiver> {
     /**
      * Restart service every 30 minutes, just in case it has been collected
      */
-    private static final long REPEAT_TIME_MILLISECONDS = 1000 * 60 * 30;
+    private static final long REPEAT_TIME_MILLISECONDS = 1000 * 60 * 15;
 
     /**
      * Broadcast event that is sent when the user grants us permission to get automatic tracking data

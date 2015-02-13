@@ -7,6 +7,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.orangegangsters.github.lib.SensorStepService;
+import com.orangegangsters.github.stepsensor.MainActivity;
+import com.orangegangsters.github.stepsensor.R;
 
 /**
  * Created by oliviergoutay on 2/5/15.
@@ -67,6 +69,26 @@ public class SensorStepServiceImpl extends SensorStepService {
         SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.putInt(ZERO_STEPS_PREFERENCE_KEY, getRawSteps());
         editor.apply();
+    }
+
+    @Override
+    public Class getNotificationLaunchClass() {
+        return MainActivity.class;
+    }
+
+    @Override
+    public int getNotificationIcon() {
+        return R.drawable.ic_launcher;
+    }
+
+    @Override
+    public String getNotificationContentTitle() {
+        return mContext.getString(R.string.app_name);
+    }
+
+    @Override
+    public String getNotificationContentText() {
+        return mContext.getString(R.string.notification_text);
     }
 
     private void initSharedPreferences() {

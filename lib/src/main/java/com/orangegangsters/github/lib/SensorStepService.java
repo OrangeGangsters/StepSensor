@@ -116,7 +116,6 @@ public abstract class SensorStepService extends Service implements SensorEventLi
         if (mWakeLock != null) {
             mWakeLock.release();
         }
-        stopForeground(true);
         super.onDestroy();
     }
 
@@ -169,7 +168,6 @@ public abstract class SensorStepService extends Service implements SensorEventLi
             Log.d(TAG, "Register sensor listener");
             SensorManager sm = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
             sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER), SensorManager.SENSOR_DELAY_FASTEST);
-            sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
         }
     }
 
@@ -185,6 +183,7 @@ public abstract class SensorStepService extends Service implements SensorEventLi
             Log.d(TAG, "Unregister sensor listener");
             SensorManager sm = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
             sm.unregisterListener(this);
+            stopForeground(true);
         }
     }
 

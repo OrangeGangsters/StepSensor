@@ -33,7 +33,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.orangegangsters.github.lib.BootCompletedReceiver.START_SENSOR_SERVICE" />
-                <action android:name="com.orangegangsters.github.lib.BootCompletedReceiver.STOP_UPDATE_SERVICE" />
+                <action android:name="com.orangegangsters.github.lib.BootCompletedReceiver.STOP_SENSOR_SERVICE" />
             </intent-filter>
         </receiver>
     </application>

@@ -110,6 +110,9 @@ public abstract class SensorStepServiceManager<T extends SensorStepReceiver> {
         }
         if (mService != null) {
             alarm.cancel(mService);
+            if (SensorStepService.getInstance() != null) {
+                SensorStepService.getInstance().unregisterSensorStep();
+            }
         }
 
         mService = null;

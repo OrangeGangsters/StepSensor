@@ -5,6 +5,8 @@
     <uses-feature
         android:name="android.hardware.sensor.stepcounter"
         android:required="false"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
 
     <application
         android:allowBackup="true"

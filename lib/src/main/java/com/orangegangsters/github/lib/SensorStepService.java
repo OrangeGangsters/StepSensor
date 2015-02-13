@@ -4,14 +4,18 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -21,10 +25,18 @@ import android.util.Log;
 public abstract class SensorStepService extends Service implements SensorEventListener {
 
     private static final String TAG = "SensorStepService";
+    private static final int SCREEN_OFF_RECEIVER_DELAY = 5000;
 
     protected Context mContext;
     private static SensorStepCallback mCallback;
     private SensorStepServiceManager mSensorManager;
+    private PowerManager.WakeLock mWakeLock;
+
+    private static SensorStepService mInstance;
+
+    public static SensorStepService getInstance() {
+        return mInstance;
+    }
 
     public SensorStepService() {
     }
@@ -33,15 +45,53 @@ public abstract class SensorStepService extends Service implements SensorEventLi
         this.mContext = context;
     }
 
+    BroadcastReceiver mScreenOffBroadcastReceiver = new BroadcastReceiver() {
+
+        //When Event is published, onReceive method is called
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            Log.i(TAG, "onReceive(" + intent + ")");
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF) || intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
+                Log.d(TAG, "SensorStepScreenOffReceiver triggered, registering StepSensor again");
+                restartListener(context);
+
+                Runnable runnable = new Runnable() {
+                    public void run() {
+                        Log.d(TAG, "SensorStepScreenOffReceiver Runnable executes");
+                        restartListener(context);
+                    }
+                };
+
+                new Handler().postDelayed(runnable, SCREEN_OFF_RECEIVER_DELAY);
+            }
+        }
+    };
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "SensorStepService onCreate");
+
+        PowerManager manager =
+                (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock = manager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+        mWakeLock.acquire();
+
+        registerReceiver(mScreenOffBroadcastReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+        registerReceiver(mScreenOffBroadcastReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "SensorStepService onStartCommand service");
 
         this.mContext = getApplicationContext();
+        mInstance = this;
 
         //Start as a foreground service to keep running
         if (mContext != null) {
             startForeground(SensorStepServiceManager.SERVICE_ID, getNotification(mContext));
+            Log.d(TAG, "SensorStepService startForeground service");
         }
 
         if (SensorStepServiceManager.isStepCounterActivated(mContext)) {
@@ -50,7 +100,24 @@ public abstract class SensorStepService extends Service implements SensorEventLi
             unregisterSensorStep();
         }
 
+        if (mWakeLock != null) {
+            mWakeLock.acquire();
+            Log.d(TAG, "Acquired Partial WakeLock service");
+        }
+
         return Service.START_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "SensorStepService onDestroy");
+        unregisterReceiver(mScreenOffBroadcastReceiver);
+        unregisterSensorStep();
+        if (mWakeLock != null) {
+            mWakeLock.release();
+        }
+        stopForeground(true);
+        super.onDestroy();
     }
 
     @Override
@@ -101,7 +168,8 @@ public abstract class SensorStepService extends Service implements SensorEventLi
         if (mContext != null) {
             Log.d(TAG, "Register sensor listener");
             SensorManager sm = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
-            sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER), SensorManager.SENSOR_DELAY_NORMAL);
+            sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER), SensorManager.SENSOR_DELAY_FASTEST);
+            sm.registerListener(this, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
         }
     }
 
@@ -117,6 +185,20 @@ public abstract class SensorStepService extends Service implements SensorEventLi
             Log.d(TAG, "Unregister sensor listener");
             SensorManager sm = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
             sm.unregisterListener(this);
+        }
+    }
+
+    /**
+     * Allows to restart the listener (screen off etc...)
+     */
+    public void restartListener(Context context) {
+        if (SensorStepServiceManager.isStepCounterActivated(context)) {
+            SensorStepService sensorStepService = SensorStepService.getInstance();
+            if (sensorStepService != null) {
+                sensorStepService.unregisterSensorStep();
+                sensorStepService.registerSensorStep();
+                mWakeLock.acquire();
+            }
         }
     }
 

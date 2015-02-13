@@ -24,9 +24,9 @@ public abstract class SensorStepServiceManager<T extends SensorStepReceiver> {
     private static final String TAG = "SensorStepServiceManager";
 
     /**
-     * Restart service every 30 minutes, just in case it has been collected
+     * Restart service every 10 minutes, just in case it has been collected
      */
-    private static final long REPEAT_TIME_MILLISECONDS = 1000 * 60 * 15;
+    private static final long REPEAT_TIME_MILLISECONDS = 1000 * 60 * 10;
 
     /**
      * Broadcast event that is sent when the user grants us permission to get automatic tracking data
